@@ -33,6 +33,15 @@ class Item(ABC):
     
     @nome.setter #Encapsulamento e validação dos parametros, toranando eles privados e validando quanto ao tiṕo e caso o usuario insira valores vazios
     def nome(self, valor: str):
+"""
+    Define e valida o nome do item.
+
+    Args:
+        valor: Texto contendo o nome do item.
+
+    Raises:
+        ValueError: Se o valor não for uma string ou contiver apenas espaços.
+"""
         if not isinstance(valor, str) or not valor.strip():
             raise ValueError("Nome invalido")
         self.__nome = valor.strip()
@@ -43,6 +52,15 @@ class Item(ABC):
     
     @quantidade.setter
     def quantidade(self, valor: int):
+"""
+    Define e valida a quantidade do item.
+
+    Args:
+        valor: Quantidade inteira a ser registrada.
+
+    Raises:
+        ValueError: Se o valor não for um número inteiro ou for menor/igual a zero.
+"""
         if not isinstance(valor, int) or valor <= 0:
             raise ValueError("Valor invalido")
         self.__quantidade = valor
@@ -53,10 +71,26 @@ class Item(ABC):
     
     @descricao.setter
     def descricao(self, valor: str):
+    """
+        Define e valida a descrição do item.
+
+        Args:
+            valor: Texto contendo as características do item.
+
+        Raises:
+            ValueError: Se o valor não for uma string ou contiver apenas espaços.
+    """
         if not isinstance(valor, str) or not valor.strip():
             raise ValueError("Valor invalido")
         self.__descricao = valor.strip()
 
     @abstractmethod
     def exibir_detalhes(self):
+    """
+        Exibe as informações detalhadas e específicas do item no terminal/interface.
+
+        Método abstrato que força a implementação polimórfica nas classes
+        filhas (ex.: ItemAlimento, ItemRoupa, ItemRacao), permitindo que cada
+        uma apresente seus atributos exclusivos.
+    """
         pass
