@@ -1,12 +1,25 @@
-from datetime import date
+"""
+    Módulo de especialização de itens alimentícios do sistema Open Hands.
 
+    Define a classe concreta ItemAlimento, derivada da classe abstrata Item,
+    incorporando controle de prazos de validade e descarte de produtos vencidos.
+"""
+
+from datetime import date
 from .item import Item
 
 class ItemAlimento(Item):
 
+"""
+    Representa um item do tipo alimento destinado a doações.
+
+    Especializa a classe base Item adicionando o controle da data de validade
+    para garantir a segurança alimentar dos beneficiários atendidos pelo sistema.
+"""
+
     def __init__(self, nome: str, quantidade: int, descricao: str, validade: date):
-        super().__init__(nome, quantidade, descricao)
-        self.validade = validade
+        super().__init__(nome, quantidade, descricao) #Herança dos atributos da classe mãe Item
+        self.validade = validade #Data de validade (deve ser posterior ou igual à data atual)
 
     @property
     def validade(self):
@@ -14,7 +27,15 @@ class ItemAlimento(Item):
     
     @validade.setter
     def validade(self, valor: date):
+"""
+    Define e valida a data de validade do alimento.
 
+    Args:
+         valor: Objeto date contendo a validade do produto.
+
+    Raises:
+         ValueError: Se o valor não for uma instância de date ou se a data for anterior à data atual.
+"""
         if not isinstance(valor, date):
             raise ValueError("Insira uma data valida")
         if valor <  date.today():
@@ -22,4 +43,15 @@ class ItemAlimento(Item):
         self.__validade = valor
 
     def exibir_detalhes(self):
+
+"""
+    Formata e retorna as informações detalhadas do alimento.
+
+    Sobrescreve o método abstrato herdado de Item para incluir a exibição
+    formatada da data de validade (DD/MM/AAAA) junto aos atributos base.
+
+    Returns:
+        str: String formatada contendo nome, quantidade, validade e descrição.
+"""
+        
         return (f"Item: {self.nome}\nQuantidade: {self.quantidade}\nValidade: {self.validade.strftime('%d/%m/%Y')}\nDescrição:{self.descricao}")
