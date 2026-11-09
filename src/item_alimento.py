@@ -1,5 +1,6 @@
 from datetime import date
-from item import Item
+
+from .item import Item
 
 class ItemAlimento(Item):
 
