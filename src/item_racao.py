@@ -5,10 +5,7 @@
     incorporando controle de prazos de validade e descarte de produtos vencidos.
 """
 from datetime import date
-try: # ALTERADO: funciona como pacote (app/item_racao.py) ou com os arquivos na mesma pasta
-    from .item import Item, converter_data # ALTERADO: importa também converter_data
-except ImportError:
-    from item import Item, converter_data
+from item import Item, converter_data
 
 class ItemRacao(Item):
     """
@@ -26,7 +23,7 @@ class ItemRacao(Item):
         return self.__validade
 
     @validade.setter
-    def validade(self, valor): # ALTERADO: sem a dica de tipo date, porque agora aceita também texto
+    def validade(self, valor): 
         """
         Define e valida a data de validade do item.
 
@@ -36,9 +33,9 @@ class ItemRacao(Item):
         Raises:
              ValueError: Se o valor não for uma data válida ou se a data for anterior à data atual.
         """
-        valor = converter_data(valor) # ALTERADO: converte texto em date e recusa o que não for data (antes: isinstance(valor, date))
+        valor = converter_data(valor) 
         if valor < date.today():
-            raise ValueError("Nao aceitamos racoes vencidas") # ALTERADO: a mensagem dizia "alimentos vencidos"
+            raise ValueError("Nao aceitamos racoes vencidas")
         self.__validade = valor
 
     def exibir_detalhes(self):
@@ -51,7 +48,7 @@ class ItemRacao(Item):
         Returns:
             str: String formatada contendo nome, quantidade, validade e descrição.
         """
-        # ALTERADO: a validade agora sai em DD/MM/AAAA, como a docstring diz (antes saía AAAA-MM-DD), e o formato é o mesmo das outras classes
+       
         return (f"Item: {self.nome}\n"
                 f"Quantidade: {self.quantidade}\n"
                 f"Validade: {self.validade.strftime('%d/%m/%Y')}\n"
