@@ -6,10 +6,7 @@
     com controle da condição de conservação do produto.
 """
 
-try: # ALTERADO: funciona como pacote (app/item_brinquedo.py) ou com os arquivos na mesma pasta
-    from .item import Item
-except ImportError:
-    from item import Item
+from item import Item
 
 class ItemBrinquedo(Item):
     """
@@ -38,7 +35,7 @@ class ItemBrinquedo(Item):
         Raises:
             ValueError: Se o valor não for um inteiro ou estiver fora do intervalo de 0 a 10.
         """
-        if type(valor) is not int or not 0 <= valor <= 10: # ALTERADO: type() no lugar de isinstance(), porque True é um int em Python e passaria
+        if type(valor) is not int or not 0 <= valor <= 10: 
             raise ValueError("Valor invalido, insira um numero de 0 a 10")
         self.__estado = valor
 
@@ -52,7 +49,7 @@ class ItemBrinquedo(Item):
         Returns:
             str: Informações estruturadas contendo nome, quantidade, estado e descrição.
         """
-        # ALTERADO: mesmo formato nas cinco classes (linhas sem espaço no início e com espaço depois de "Descrição:")
+        
         return (f"Item: {self.nome}\n"
                 f"Quantidade: {self.quantidade}\n"
                 f"Estado: {self.estado}/10\n"
