@@ -7,10 +7,7 @@
 """
  
 from datetime import date
-try: # ALTERADO: funciona como pacote (app/item_alimento.py) ou com os arquivos na mesma pasta
-    from .item import Item, converter_data # ALTERADO: importa também converter_data
-except ImportError:
-    from item import Item, converter_data
+from item import Item, converter_data
  
 class ItemAlimento(Item):
     """
@@ -29,7 +26,7 @@ class ItemAlimento(Item):
         return self.__validade
  
     @validade.setter
-    def validade(self, valor): # ALTERADO: sem a dica de tipo date, porque agora aceita também texto
+    def validade(self, valor):
         """
         Define e valida a data de validade do alimento.
  
@@ -39,7 +36,7 @@ class ItemAlimento(Item):
         Raises:
              ValueError: Se o valor não for uma data válida ou se a data for anterior à data atual.
         """
-        valor = converter_data(valor) # ALTERADO: converte texto em date e recusa o que não for data (antes: isinstance(valor, date))
+        valor = converter_data(valor)
         if valor < date.today():
             raise ValueError("Nao aceitamos alimentos vencidos")
         self.__validade = valor
@@ -54,7 +51,7 @@ class ItemAlimento(Item):
         Returns:
             str: String formatada contendo nome, quantidade, validade e descrição.
         """
-        # ALTERADO: mesmo formato nas cinco classes (linhas sem espaço no início e com espaço depois de "Descrição:")
+        
         return (f"Item: {self.nome}\n"
                 f"Quantidade: {self.quantidade}\n"
                 f"Validade: {self.validade.strftime('%d/%m/%Y')}\n"
