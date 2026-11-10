@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "nome": "Bazar Beneficente de Roupas",
+    "link": "https://www.google.com/maps/search/?api=1&query=Bazar+Beneficente+Betim"
+  },
+  {
+    "id": 2,
+    "nome": "Campanha do Agasalho",
+    "link": "https://www.google.com/maps/search/?api=1&query=Campanha+do+Agasalho+Betim"
+  },
+  {
+    "id": 3,
+    "nome": "Casa de Apoio e Doações",
+    "link": "https://www.google.com/maps/search/?api=1&query=Doacao+de+Roupas+Betim"
+  }
+]
