@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nome": "Banco de Alimentos Betim", "link": "https://www.google.com/maps/search/?api=1&query=Banco+de+Alimentos+Betim" },
+  { "id": 2, "nome": "Cozinha Comunitária Esperança", "link": "https://www.google.com/maps/search/?api=1&query=Cozinha+Comunitaria+Betim" },
+  { "id": 3, "nome": "Associação Pão Solidário", "link": "https://www.google.com/maps/search/?api=1&query=Associacao+Pao+Solidario+Betim" }
+]
