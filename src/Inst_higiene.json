@@ -1,0 +1,18 @@
+
+[
+  {
+    "id": 1,
+    "nome": "Abrigo Esperança",
+    "link": "https://www.google.com/maps/search/?api=1&query=Abrigo+Esperanca+Betim"
+  },
+  {
+    "id": 2,
+    "nome": "Lar dos Idosos São José",
+    "link": "https://www.google.com/maps/search/?api=1&query=Lar+dos+Idosos+Betim"
+  },
+  {
+    "id": 3,
+    "nome": "Casa de Apoio Vida Nova",
+    "link": "https://www.google.com/maps/search/?api=1&query=Casa+de+Apoio+Betim"
+  }
+]
