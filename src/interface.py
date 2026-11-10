@@ -1,25 +1,24 @@
 import webbrowser  # Abrir links no navegador
 import tkinter as tk  # Interface gráfica (já vem com o Python)
 from tkinter import messagebox  # Janelas de aviso
-
-from .sistema import Dados # Classe Dados do sistema.py
-from .usuario import Usuario  # Classe Usuario do usuario.py
+from sistema import Dados
 
 COR = "#ffc24c"  # Cor de fundo de todas as telas
 TAMANHO = "1000x650"  # Tamanho da janela (largura x altura)
 
-dados = Dados() # Gerenciador de I/O
+dados = Dados()  # Todos os métodos de leitura, gravação e validação ficam no sistema.py
 usuario_logado = ""  # Guarda quem está logado
 
-#"é uma ferramenta surpresa que vamos precisar mais tarde" - Mickey Mouse
-janela = None
-imagem = None
+janela = None  # Janela principal (criada em iniciar)
+imagem = None  # Imagem do título (carregada em iniciar)
+
 
 def limpar():  # Apaga tudo da janela para desenhar a próxima tela
     for widget in janela.winfo_children():  # Para cada elemento da tela
         widget.destroy()  # Remove
     if imagem:  # Se a imagem foi carregada
         tk.Label(janela, image=imagem).pack(pady=10)  # Coloca a imagem no topo de toda tela
+
 
 # TELA DE LOGIN
 def tela_login():
@@ -31,7 +30,7 @@ def tela_login():
     def entrar():  # Roda ao clicar em Entrar
         global usuario_logado  # Vamos alterar a variável global
         nome = campo.get().strip()  # Lê o que foi digitado
-        if nome not in dados.ler_usuarios():  # Se o usuário não existe
+        if not dados.usuario_existe(nome):  # Se o usuário não existe
             messagebox.showerror("Erro", "Usuário não encontrado.")  # Avisa
             return  # Para aqui
         usuario_logado = nome  # Guarda o usuário
@@ -41,7 +40,7 @@ def tela_login():
     tk.Button(janela, text="Cadastrar", command=tela_cadastro).pack()  # Botão cadastrar
 
 
-#TELA DE CADASTRO
+# TELA DE CADASTRO
 def tela_cadastro():
     limpar()  # Limpa a janela
     tk.Label(janela, text="Cadastro", font=("Arial", 20, "bold")).pack(pady=10)  # Título
@@ -61,7 +60,7 @@ def tela_cadastro():
         if dados.usuario_existe(n_usuario):  # Se já existe
             messagebox.showerror("Erro", "Esse nome de usuário já existe.")  # Avisa
             return  # Para aqui
-        Usuario(nome, cep, n_usuario).registro(dados)  # Grava no usuario.json
+        dados.gravar_usuario(n_usuario, nome, cep)  # Grava no usuarios.json
         usuario_logado = n_usuario  # Já fica logado
         tela_inicial()  # Vai para a tela inicial
 
@@ -72,7 +71,9 @@ def tela_cadastro():
 # TELA PARA ESCOLHA DE ITEM
 def tela_inicial():
     limpar()  # Limpa a janela
-    tk.Label(janela, text=f"Olá, {usuario_logado}!", font=("Arial", 16, "bold")).pack(pady=10)  # Boas-vindas
+    usuario = dados.buscar_usuario(usuario_logado) or {}  # Dados do usuário logado
+    nome = usuario.get("nome") or usuario_logado  # Nome completo, ou o usuário se não houver
+    tk.Label(janela, text=f"Olá, {nome.split()[0]}!", font=("Arial", 16, "bold")).pack(pady=10)  # Boas-vindas
     tk.Label(janela, text="O que você quer doar?").pack(pady=10)  # Pergunta
     for item in dados.ITENS:  # Um botão para cada item
         tk.Button(janela, text=item, width=20, command=lambda i=item: tela_instituicoes(i)).pack(pady=4)  # Botão
@@ -83,56 +84,86 @@ def tela_inicial():
 # TELA PARA VER DOAÇÕES
 def tela_doacoes():
     limpar()  # Limpa a janela
-    doacoes = dados.doacoes_de(usuario_logado)  # Lê o arquivo de doações deste usuário
+    doacoes = dados.doacoes_de(usuario_logado)  # Doações deste usuário
     tk.Label(janela, text="Minhas doações", font=("Arial", 16, "bold")).pack(pady=10)  # Título
     quadro = tk.Frame(janela, bg=COR)  # Área do botão, presa na parte de baixo
     quadro.pack(side="bottom", pady=10)  # Empacotada antes da lista para sempre aparecer
     lista = tk.Listbox(janela, width=60, height=10)  # Lista de doações
     lista.pack(padx=10, fill="both", expand=True)  # Ocupa o espaço que sobrar
     for d in doacoes:  # Uma linha para cada doação
-        lista.insert("end", f"{d['item']} - {d['instituicao']}")  # Item e instituição
+        lista.insert("end", f"{d['item']} - {d['instituicao']}")  # Item (com detalhes) e instituição
     if not doacoes:  # Se ainda não há doações
         lista.insert("end", "Nenhuma doação registrada ainda.")  # Avisa
     tk.Button(quadro, text="Voltar", command=tela_inicial).pack()  # Botão voltar
 
 
-#TELA PARA DOAÇÂO
+# TELA PARA DOAÇÃO
 def tela_instituicoes(item):
     limpar()  # Limpa a janela
-    instituicoes = dados.instituicoes_por_tipo(item)  # Lê o JSON desse item
+    instituicoes = dados.ler_json(dados.ARQUIVOS_INSTITUICOES[item])  # Instituições desse item (arquivo inst_*.json)
     tk.Label(janela, text=f"Doar {item}", font=("Arial", 16, "bold")).pack(pady=10)  # Título
     quadro = tk.Frame(janela, bg=COR)  # Área dos botões, presa na parte de baixo da janela
     quadro.pack(side="bottom", pady=10)  # Empacotada antes da lista para sempre aparecer
     lista = tk.Listbox(janela, width=60, height=10)  # Lista de instituições
     lista.pack(padx=10, fill="both", expand=True)  # A lista ocupa só o espaço que sobrar
-    for inst in instituicoes:  # Preenche a lista
-        lista.insert("end", f"{inst['id']} - {inst['nome']}")  # Número e nome
+    for pos, inst in enumerate(instituicoes, start=1):  # Preenche a lista
+        lista.insert("end", f"{inst.get('id', pos)} - {inst['nome']}")  # Número e nome
+    if not instituicoes:  # Se não há instituições para esse item
+        lista.insert("end", "Nenhuma instituição cadastrada para este item.")  # Avisa
 
     def escolhida():  # Devolve a instituição selecionada
-        if not lista.curselection():  # Se nada foi selecionado
+        if not instituicoes or not lista.curselection():  # Se nada foi selecionado
             messagebox.showwarning("Atenção", "Selecione uma instituição.")  # Avisa
             return None  # Sem instituição
         return instituicoes[lista.curselection()[0]]  # Pega pela posição na lista
 
     def abrir_mapa():  # Abre o link no navegador
         inst = escolhida()  # Pega a instituição
-        if inst:  # Se escolheu
+        if inst and inst.get("link"):  # Se escolheu e tem link
             webbrowser.open(inst["link"])  # Abre o link
 
-    def doar():  # Registra a doação
+    def doar():  # Vai para a tela com os dados do item
         inst = escolhida()  # Pega a instituição
         if inst:  # Se escolheu
-            dados.doar(usuario_logado, item, inst["nome"])
-            messagebox.showinfo("Obrigado!", f"Você vai doar {item} para: {inst['nome']}")  # Confirma
-            tela_inicial()  # Volta ao início
+            tela_item(item, inst)  # Pede nome, quantidade, descrição e os campos específicos
 
     tk.Button(quadro, text="Abrir mapa", command=abrir_mapa).pack(side="left", padx=5)  # Botão mapa
     tk.Button(quadro, text="Doar", command=doar).pack(side="left", padx=5)  # Botão doar
     tk.Button(quadro, text="Voltar", command=tela_inicial).pack(side="left", padx=5)  # Botão voltar
 
-def iniciar() -> None: #ponto de entrada para a interface, no main.py
-    # globais porque limpar() e tela_*() precisam acessar
-    global janela, imagem
+
+# TELA COM OS DADOS DO ITEM
+def tela_item(item, inst):
+    limpar()  # Limpa a janela
+    tk.Label(janela, text=f"Dados do item: {item}", font=("Arial", 16, "bold")).pack(pady=10)  # Título
+    tk.Label(janela, text=f"Instituição: {inst['nome']}").pack(pady=(0, 10))  # Instituição escolhida
+    campos = []  # Campos de texto, na ordem da tela
+    extras = [rotulo for _, rotulo, _ in dados.CLASSES_ITEM[item][1]]  # Campos específicos do item
+    for texto in ["Nome", "Quantidade", "Descrição"] + extras:  # Campos comuns + específicos
+        tk.Label(janela, text=texto + ":").pack()  # Texto
+        campo = tk.Entry(janela, width=40)  # Campo
+        campo.pack(pady=3)  # Posiciona
+        campos.append(campo)  # Guarda na lista
+
+    def confirmar():  # Valida o item e registra a doação
+        valores = [c.get().strip() for c in campos]  # Lê todos os campos
+        try:
+            objeto = dados.criar_item(item, valores)  # O sistema converte e valida
+        except ValueError as erro:
+            messagebox.showerror("Erro", str(erro))  # Mostra o motivo
+            return  # Para aqui
+        detalhes = objeto.exibir_detalhes()  # Texto com os detalhes do item
+        resumo = f"{item}: " + detalhes.replace("Item: ", "", 1).replace("\n", " | ")  # Tipo e detalhes em uma linha
+        dados.doar(usuario_logado, resumo, inst["nome"])  # O sistema grava a doação
+        messagebox.showinfo("Obrigado!", f"Você vai doar para: {inst['nome']}\n\n{detalhes}")  # Confirma
+        tela_inicial()  # Volta ao início
+
+    tk.Button(janela, text="Confirmar doação", command=confirmar).pack(pady=10)  # Botão confirmar
+    tk.Button(janela, text="Voltar", command=lambda: tela_instituicoes(item)).pack()  # Botão voltar
+
+
+def iniciar() -> None:  # Cria a janela e abre o programa (pode ser chamada por um main.py)
+    global janela, imagem  # limpar() e as telas precisam acessar
 
     janela = tk.Tk()  # Cria a janela
     janela.title("Doação")  # Título
@@ -149,3 +180,7 @@ def iniciar() -> None: #ponto de entrada para a interface, no main.py
 
     tela_login()  # Começa pela tela de login
     janela.mainloop()  # Mantém a janela aberta
+
+
+if __name__ == "__main__":  # Permite rodar `python interface.py` direto
+    iniciar()
