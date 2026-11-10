@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "nome": "Abrigo de Animais Patinhas",
+    "link": "https://www.google.com/maps/search/?api=1&query=Abrigo+de+Animais+Betim"
+  },
+  {
+    "id": 2,
+    "nome": "ONG Amigo Bicho",
+    "link": "https://www.google.com/maps/search/?api=1&query=ONG+Protecao+Animal+Betim"
+  },
+  {
+    "id": 3,
+    "nome": "Centro de Resgate Animal",
+    "link": "https://www.google.com/maps/search/?api=1&query=Resgate+Animal+Betim"
+  }
+]
